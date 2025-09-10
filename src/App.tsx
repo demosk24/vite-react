@@ -209,29 +209,14 @@ const App: React.FC = () => {
                   <td className="table-cell">{entry.round}</td>
                   <td className="table-cell">{entry.betNumber}</td>
                   <td className="table-cell amount">
-                    ${entry.bet.toFixed(2)} <button
-                      onClick={(e) => copyToClipboard(e.currentTarget, entry.bet.toFixed(2))}
-                      className="copy-btn"
-                    >
-                      Copy
-                    </button>
+                    ${entry.bet.toFixed(2)}
                   </td>
                   <td className="table-cell win">{entry.outcome}</td>
                   <td className="table-cell amount">
-                    ${entry.profitLoss.toFixed(2)} <button
-                      onClick={(e) => copyToClipboard(e.currentTarget, entry.profitLoss.toFixed(2))}
-                      className="copy-btn"
-                    >
-                      Copy
-                    </button>
+                    ${entry.profitLoss.toFixed(2)}
                   </td>
                   <td className="table-cell amount">
-                    ${entry.balance.toFixed(2)} <button
-                      onClick={(e) => copyToClipboard(e.currentTarget, entry.balance.toFixed(2))}
-                      className="copy-btn"
-                    >
-                      Copy
-                    </button>
+                    ${entry.balance.toFixed(2)}
                   </td>
                 </tr>
               ))}
