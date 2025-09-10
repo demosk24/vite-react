@@ -1,57 +1,70 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 
+// Define interface for history entries
+interface HistoryEntry {
+  round: number;
+  betNumber: number;
+  bet: number;
+  outcome: 'Win' | 'Loss';
+  profitLoss: number;
+  balance: number;
+}
+
 function App() {
-  // State variables
-  const [balance, setBalance] = useState(1000);
-  const [maxLevels, setMaxLevels] = useState(8);
-  const [betProgression, setBetProgression] = useState([]);
-  const [currentBet, setCurrentBet] = useState(0);
-  const [profitMargin] = useState(100);
-  const [lossStreak, setLossStreak] = useState(0);
-  const [totalWins, setTotalWins] = useState(0);
-  const [totalLosses, setTotalLosses] = useState(0);
-  const [round, setRound] = useState(0);
-  const [betNumber, setBetNumber] = useState(0);
-  const [history, setHistory] = useState([]);
-  const [initialSet, setInitialSet] = useState(false);
-  const [initialBalanceInput, setInitialBalanceInput] = useState('1000');
-  const [maxLevelsInput, setMaxLevelsInput] = useState('8');
-  const rainRef = useRef(null);
+  // State variables with TypeScript types
+  const [balance, setBalance] = useState<number>(1000);
+  const [maxLevels, setMaxLevels] = useState<number>(8);
+  const [betProgression, setBetProgression] = useState<number[]>([]);
+  const [currentBet, setCurrentBet] = useState<number>(0);
+  const [profitMargin] = useState<number>(100);
+  const [lossStreak, setLossStreak] = useState<number>(0);
+  const [totalWins, setTotalWins] = useState<number>(0);
+  const [totalLosses, setTotalLosses] = useState<number>(0);
+  const [round, setRound] = useState<number>(0);
+  const [betNumber, setBetNumber] = useState<number>(0);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [initialSet, setInitialSet] = useState<boolean>(false);
+  const [initialBalanceInput, setInitialBalanceInput] = useState<string>('1000');
+  const [maxLevelsInput, setMaxLevelsInput] = useState<string>('8');
+  const rainRef = useRef<HTMLDivElement>(null);
 
   // Calculate Martingale progression
   const calculateProgression = useCallback(() => {
     const base = balance / Math.pow(2, maxLevels);
-    const progression = Array.from({ length: maxLevels }, (_, i) => base * Math.pow(2, i));
+    const progression: number[] = Array.from({ length: maxLevels }, (_, i) => base * Math.pow(2, i));
     setBetProgression(progression);
     setCurrentBet(progression[0] || 0);
   }, [balance, maxLevels]);
 
   // Copy to clipboard with flash animation
-  const copyToClipboard = useCallback((amount, buttonRef) => {
-    if (buttonRef.current) {
-      buttonRef.current.classList.add('flash');
-      setTimeout(() => buttonRef.current.classList.remove('flash'), 400);
-    }
+  const copyToClipboard = useCallback(
+    (amount: string, buttonRef: React.RefObject<HTMLButtonElement>) => {
+      if (buttonRef.current) {
+        buttonRef.current.classList.add('flash');
+        setTimeout(() => buttonRef.current.classList.remove('flash'), 400);
+      }
 
-    if (!window.isSecureContext) {
-      alert('Copying is only supported in a secure context (HTTPS).');
-      return;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(amount).then(() => {
-        alert(`Copied ${amount} to clipboard!`);
-      }).catch((err) => {
-        console.error('Failed to copy: ', err);
-        alert('Failed to copy to clipboard.');
-      });
-    } else {
-      alert('Clipboard API not supported in this browser.');
-    }
-  }, []);
+      if (!window.isSecureContext) {
+        alert('Copying is only supported in a secure context (HTTPS).');
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(amount).then(() => {
+          alert(`Copied ${amount} to clipboard!`);
+        }).catch((err) => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy to clipboard.');
+        });
+      } else {
+        alert('Clipboard API not supported in this browser.');
+      }
+    },
+    []
+  );
 
   // Calculate win payout
-  const calculateWinPayout = useCallback(() => {
+  const calculateWinPayout = useCallback((): number => {
     return currentBet * (profitMargin / 100);
   }, [currentBet, profitMargin]);
 
@@ -88,12 +101,12 @@ function App() {
     const payout = calculateWinPayout();
     const newBalance = balance + payout;
     setBalance(newBalance);
-    setHistory((prev) => [
+    setHistory((prev: HistoryEntry[]) => [
       ...prev,
       { round, betNumber: 1, bet: currentBet, outcome: 'Win', profitLoss: payout, balance: newBalance },
     ]);
-    setTotalWins((prev) => prev + 1);
-    setRound((prev) => prev + 1);
+    setTotalWins((prev: number) => prev + 1);
+    setRound((prev: number) => prev + 1);
     setLossStreak(0);
     setBetNumber(0);
   }, [balance, currentBet, initialSet, round, calculateWinPayout, resetSystem]);
@@ -107,19 +120,19 @@ function App() {
       alert('Insufficient balance!');
       return;
     }
-    setBetNumber((prev) => prev + 1);
+    setBetNumber((prev: number) => prev + 1);
     const loss = -currentBet;
     const newBalance = balance + loss;
     setBalance(newBalance);
-    setHistory((prev) => [
+    setHistory((prev: HistoryEntry[]) => [
       ...prev,
       { round, betNumber: betNumber + 1, bet: currentBet, outcome: 'Loss', profitLoss: loss, balance: newBalance },
     ]);
-    setTotalLosses((prev) => prev + 1);
-    setLossStreak((prev) => prev + 1);
+    setTotalLosses((prev: number) => prev + 1);
+    setLossStreak((prev: number) => prev + 1);
     setCurrentBet(betProgression[lossStreak + 1] || currentBet * 2);
     if (lossStreak + 1 >= maxLevels) {
-      setRound((prev) => prev + 1);
+      setRound((prev: number) => prev + 1);
       setLossStreak(0);
       setBetNumber(0);
       setCurrentBet(betProgression[0] || 0);
@@ -166,7 +179,7 @@ function App() {
             type="number"
             id="initial-balance"
             value={initialBalanceInput}
-            onChange={(e) => setInitialBalanceInput(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInitialBalanceInput(e.target.value)}
             min="100"
             step="1"
           />
@@ -175,7 +188,7 @@ function App() {
             type="number"
             id="martingale-levels"
             value={maxLevelsInput}
-            onChange={(e) => setMaxLevelsInput(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxLevelsInput(e.target.value)}
             min="1"
             max="9"
             step="1"
@@ -201,8 +214,8 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {betProgression.map((amount, index) => {
-                const buttonRef = useRef(null);
+              {betProgression.map((amount: number, index: number) => {
+                const buttonRef = useRef<HTMLButtonElement>(null);
                 return (
                   <tr key={index}>
                     <td>{index + 1}</td>
@@ -237,10 +250,10 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {history.map((entry, index) => {
-                const betButtonRef = useRef(null);
-                const profitButtonRef = useRef(null);
-                const balanceButtonRef = useRef(null);
+              {history.map((entry: HistoryEntry, index: number) => {
+                const betButtonRef = useRef<HTMLButtonElement>(null);
+                const profitButtonRef = useRef<HTMLButtonElement>(null);
+                const balanceButtonRef = useRef<HTMLButtonElement>(null);
                 return (
                   <tr key={index}>
                     <td>{entry.round}</td>
