@@ -1,35 +1,25 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 
-// Define types for history entries
-interface HistoryEntry {
-  round: number;
-  betNumber: number;
-  bet: number;
-  outcome: 'Win' | 'Loss';
-  profitLoss: number;
-  balance: number;
-}
-
 function App() {
-  // State variables with TypeScript types
-  const [balance, setBalance] = useState<number>(1000);
-  const [maxLevels, setMaxLevels] = useState<number>(8);
-  const [betProgression, setBetProgression] = useState<number[]>([]);
-  const [currentBet, setCurrentBet] = useState<number>(0);
-  const [profitMargin] = useState<number>(100);
-  const [lossStreak, setLossStreak] = useState<number>(0);
-  const [totalWins, setTotalWins] = useState<number>(0);
-  const [totalLosses, setTotalLosses] = useState<number>(0);
-  const [round, setRound] = useState<number>(0);
-  const [betNumber, setBetNumber] = useState<number>(0);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [initialSet, setInitialSet] = useState<boolean>(false);
-  const [initialBalanceInput, setInitialBalanceInput] = useState<string>('1000');
-  const [maxLevelsInput, setMaxLevelsInput] = useState<string>('8');
-  const rainRef = useRef<HTMLDivElement>(null);
+  // State variables
+  const [balance, setBalance] = useState(1000);
+  const [maxLevels, setMaxLevels] = useState(8);
+  const [betProgression, setBetProgression] = useState([]);
+  const [currentBet, setCurrentBet] = useState(0);
+  const [profitMargin] = useState(100);
+  const [lossStreak, setLossStreak] = useState(0);
+  const [totalWins, setTotalWins] = useState(0);
+  const [totalLosses, setTotalLosses] = useState(0);
+  const [round, setRound] = useState(0);
+  const [betNumber, setBetNumber] = useState(0);
+  const [history, setHistory] = useState([]);
+  const [initialSet, setInitialSet] = useState(false);
+  const [initialBalanceInput, setInitialBalanceInput] = useState('1000');
+  const [maxLevelsInput, setMaxLevelsInput] = useState('8');
+  const rainRef = useRef(null);
 
-  // Calculate Martingale progression (memoized)
+  // Calculate Martingale progression
   const calculateProgression = useCallback(() => {
     const base = balance / Math.pow(2, maxLevels);
     const progression = Array.from({ length: maxLevels }, (_, i) => base * Math.pow(2, i));
@@ -38,7 +28,7 @@ function App() {
   }, [balance, maxLevels]);
 
   // Copy to clipboard with flash animation
-  const copyToClipboard = useCallback((amount: string, buttonRef: React.RefObject<HTMLButtonElement>) => {
+  const copyToClipboard = useCallback((amount, buttonRef) => {
     if (buttonRef.current) {
       buttonRef.current.classList.add('flash');
       setTimeout(() => buttonRef.current.classList.remove('flash'), 400);
@@ -139,7 +129,7 @@ function App() {
   // Rain animation with performance optimization
   useEffect(() => {
     const createRainDrop = () => {
-      if (rainRef.current && rainRef.current.children.length < 50) { // Limit number of raindrops
+      if (rainRef.current && rainRef.current.children.length < 50) {
         const drop = document.createElement('span');
         drop.style.left = `${Math.random() * 100}vw`;
         drop.style.animationDuration = `${Math.random() * 0.7 + 0.3}s`;
@@ -156,7 +146,7 @@ function App() {
       }
     };
 
-    const interval = setInterval(createRainDrop, 50); // Slower interval for performance
+    const interval = setInterval(createRainDrop, 50);
     return () => clearInterval(interval);
   }, []);
 
@@ -169,85 +159,58 @@ function App() {
     <>
       <div className="rain" ref={rainRef}></div>
       <div className="container">
-        <h1 className="text-3xl font-bold text-neon-green animate-pulse">
-          Horror Hacker Martingale System
-        </h1>
-        <div className="input-section flex space-x-4">
-          <div>
-            <label htmlFor="initial-balance" className="text-neon-green">
-              Balance ($):
-            </label>
-            <input
-              type="number"
-              id="initial-balance"
-              value={initialBalanceInput}
-              onChange={(e) => setInitialBalanceInput(e.target.value)}
-              min="100"
-              step="1"
-              className="ml-2 p-1 border border-neon-green rounded bg-gray-800 text-white"
-            />
-          </div>
-          <div>
-            <label htmlFor="martingale-levels" className="text-neon-green">
-              Levels (1-9):
-            </label>
-            <input
-              type="number"
-              id="martingale-levels"
-              value={maxLevelsInput}
-              onChange={(e) => setMaxLevelsInput(e.target.value)}
-              min="1"
-              max="9"
-              step="1"
-              className="ml-2 p-1 border border-neon-green rounded bg-gray-800 text-white"
-            />
-          </div>
-          <button
-            onClick={handleWin}
-            className="bg-neon-green text-black px-4 py-2 rounded hover:bg-green-400 transition"
-          >
-            Win
-          </button>
-          <button
-            onClick={handleLoss}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition"
-          >
-            Loss
-          </button>
-          <button
-            onClick={resetSystem}
-            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500 transition"
-          >
-            Reset
-          </button>
+        <h1>Horror Hacker Martingale System</h1>
+        <div className="input-section">
+          <label htmlFor="initial-balance">Balance ($):</label>
+          <input
+            type="number"
+            id="initial-balance"
+            value={initialBalanceInput}
+            onChange={(e) => setInitialBalanceInput(e.target.value)}
+            min="100"
+            step="1"
+          />
+          <label htmlFor="martingale-levels">Levels (1-9):</label>
+          <input
+            type="number"
+            id="martingale-levels"
+            value={maxLevelsInput}
+            onChange={(e) => setMaxLevelsInput(e.target.value)}
+            min="1"
+            max="9"
+            step="1"
+          />
+          <button onClick={handleWin}>Win</button>
+          <button onClick={handleLoss}>Loss</button>
+          <button onClick={resetSystem}>Reset</button>
         </div>
 
-        <div className="balance-corner text-neon-green">
-          Balance: $<span>{balance.toFixed(2)}</span><br />
-          Trades: <span>{history.length}</span><br />
+        <div className="balance-corner">
+          Balance: $<span id="current-balance">{balance.toFixed(2)}</span><br />
+          Trades: <span id="trade-count">{history.length}</span><br />
           Wins: <span>{totalWins}</span> | Losses: <span>{totalLosses}</span>
         </div>
 
         <div className="levels">
-          <h2 className="text-2xl text-neon-green">{maxLevels}-Level Martingale Bets</h2>
-          <table className="w-full border-collapse border border-neon-green">
+          <h2 id="levels-title">{maxLevels}-Level Martingale Bets</h2>
+          <table id="levels-table">
             <thead>
-              <tr className="bg-gray-800 text-neon-green">
-                <th className="border border-neon-green p-2">Level</th>
-                <th className="border border-neon-green p-2">Bet Amount</th>
+              <tr>
+                <th>Level</th>
+                <th>Bet Amount</th>
               </tr>
             </thead>
             <tbody>
               {betProgression.map((amount, index) => {
-                const buttonRef = useRef<HTMLButtonElement>(null);
+                const buttonRef = useRef(null);
                 return (
-                  <tr key={index} className="bg-gray-900">
-                    <td className="border border-neon-green p-2 text-center">{index + 1}</td>
-                    <td className="border border-neon-green p-2 text-center">
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td className="amount">
                       ${amount.toFixed(2)}{' '}
                       <button
                         ref={buttonRef}
-                        className="copy-btn bg-neon-green text-black px-2 py-1 rounded hover:bg-green-400"
+                        className="copy-btn"
                         onClick={() => copyToClipboard(amount.toFixed(2), buttonRef)}
                       >
                         Copy
@@ -260,56 +223,54 @@ function App() {
           </table>
         </div>
 
-        <div className="history mt-6">
-          <h2 className="text-2xl text-neon-green">History</h2>
-          <table className="w-full border-collapse border border-neon-green">
+        <div className="history">
+          <h2>History</h2>
+          <table id="history-table">
             <thead>
-              <tr className="bg-gray-800 text-neon-green">
-                <th className="border border-neon-green p-2">Round</th>
-                <th className="border border-neon-green p-2">Bet Number</th>
-                <th className="border border-neon-green p-2">Bet Amount</th>
-                <th className="border border-neon-green p-2">Outcome</th>
-                <th className="border border-neon-green p-2">Profit/Loss</th>
-                <th className="border border-neon-green p-2">Balance After</th>
+              <tr>
+                <th>Round</th>
+                <th>Bet Number</th>
+                <th>Bet Amount</th>
+                <th>Outcome</th>
+                <th>Profit/Loss</th>
+                <th>Balance After</th>
               </tr>
             </thead>
             <tbody>
               {history.map((entry, index) => {
-                const betButtonRef = useRef<HTMLButtonElement>(null);
-                const profitButtonRef = useRef<HTMLButtonElement>(null);
-                const balanceButtonRef = useRef<HTMLButtonElement>(null);
+                const betButtonRef = useRef(null);
+                const profitButtonRef = useRef(null);
+                const balanceButtonRef = useRef(null);
                 return (
-                  <tr key={index} className="bg-gray-900">
-                    <td className="border border-neon-green p-2 text-center">{entry.round}</td>
-                    <td className="border border-neon-green p-2 text-center">{entry.betNumber}</td>
-                    <td className="border border-neon-green p-2 text-center">
+                  <tr key={index}>
+                    <td>{entry.round}</td>
+                    <td>{entry.betNumber}</td>
+                    <td className="amount">
                       ${entry.bet.toFixed(2)}{' '}
                       <button
                         ref={betButtonRef}
-                        className="copy-btn bg-neon-green text-black px-2 py-1 rounded hover:bg-green-400"
+                        className="copy-btn"
                         onClick={() => copyToClipboard(entry.bet.toFixed(2), betButtonRef)}
                       >
                         Copy
                       </button>
                     </td>
-                    <td className={`border border-neon-green p-2 text-center ${entry.outcome === 'Win' ? 'text-green-400' : 'text-red-400'}`}>
-                      {entry.outcome}
-                    </td>
-                    <td className="border border-neon-green p-2 text-center">
+                    <td className="win">{entry.outcome}</td>
+                    <td className="amount">
                       ${entry.profitLoss.toFixed(2)}{' '}
                       <button
                         ref={profitButtonRef}
-                        className="copy-btn bg-neon-green text-black px-2 py-1 rounded hover:bg-green-400"
+                        className="copy-btn"
                         onClick={() => copyToClipboard(entry.profitLoss.toFixed(2), profitButtonRef)}
                       >
                         Copy
                       </button>
                     </td>
-                    <td className="border border-neon-green p-2 text-center">
+                    <td className="amount">
                       ${entry.balance.toFixed(2)}{' '}
                       <button
                         ref={balanceButtonRef}
-                        className="copy-btn bg-neon-green text-black px-2 py-1 rounded hover:bg-green-400"
+                        className="copy-btn"
                         onClick={() => copyToClipboard(entry.balance.toFixed(2), balanceButtonRef)}
                       >
                         Copy
