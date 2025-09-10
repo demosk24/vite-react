@@ -7,6 +7,11 @@ body {
   min-height: 100vh;
   padding: 10%;
   font-size: calc(14px + 0.5vw);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: changeBackground 3300s infinite;
 }
 
 .app-container {
@@ -412,3 +417,18 @@ body {
     height: calc(15px + 0.8vw);
   }
 }
+
+
+@keyframes changeBackground {
+            0%, 9.09% { background-image: url('1.jpg'); } /* 0s to 300s */
+            9.09%, 18.18% { background-image: url('2.jpg'); } /* 300s to 600s */
+            18.18%, 27.27% { background-image: url('3.jpg'); } /* 600s to 900s */
+            27.27%, 36.36% { background-image: url('4.jpg'); } /* 900s to 1200s */
+            36.36%, 45.45% { background-image: url('5.jpg'); } /* 1200s to 1500s */
+            45.45%, 54.54% { background-image: url('6.jpg'); } /* 1500s to 1800s */
+            54.54%, 63.63% { background-image: url('7.jpg'); } /* 1800s to 2100s */
+            63.63%, 72.72% { background-image: url('8.jpg'); } /* 2100s to 2400s */
+            72.72%, 81.81% { background-image: url('9.jpg'); } /* 2400s to 2700s */
+            81.81%, 90.90% { background-image: url('10.jpg'); } /* 2700s to 3000s */
+            90.90%, 100% { background-image: url('11.jpg'); } /* 3000s to 3300s */
+        }
