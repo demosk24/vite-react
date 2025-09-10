@@ -11,7 +11,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  animation: changeBackground 3300s infinite;
+  /* animation: changeBackground 3300s infinite;*/
 }
 
 .app-container {
