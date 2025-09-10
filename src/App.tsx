@@ -19,11 +19,8 @@ const App: React.FC = () => {
   const [currentBet, setCurrentBet] = useState<number>(base);
   const [betProgression, setBetProgression] = useState<number[]>([]);
   const [profitMargin] = useState<number>(100);
-  const [lossStreak, setLossStreak] = useState<number>(0);
   const [totalWins, setTotalWins] = useState<number>(0);
-  const [totalLosses, setTotalLosses] = useState<number>(0);
   const [round, setRound] = useState<number>(0);
-  const [betNumber, setBetNumber] = useState<number>(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [initialSet, setInitialSet] = useState<boolean>(false);
   const rainRef = useRef<HTMLDivElement>(null);
@@ -98,11 +95,8 @@ const App: React.FC = () => {
     setMaxLevels(newMaxLevels);
     setInitialBalance(newBalance.toString());
     setInitialSet(true);
-    setLossStreak(0);
     setTotalWins(0);
-    setTotalLosses(0);
     setRound(0);
-    setBetNumber(0);
     setHistory([]);
     setBase(newBalance / Math.pow(2, newMaxLevels));
     calculateProgression();
@@ -116,15 +110,12 @@ const App: React.FC = () => {
       alert('Insufficient balance!');
       return;
     }
-    setBetNumber(1); // Always win on first bet
     const payout = calculateWinPayout();
     const newBalance = balance + payout;
     setBalance(newBalance);
     setHistory([...history, { round, betNumber: 1, bet: currentBet, outcome: 'Win', profitLoss: payout, balance: newBalance }]);
     setTotalWins(totalWins + 1);
     setRound(round + 1);
-    setLossStreak(0);
-    setBetNumber(0);
     calculateProgression();
   };
 
